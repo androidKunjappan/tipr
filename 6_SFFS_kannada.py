@@ -5,10 +5,9 @@ from numpy import genfromtxt
 from sklearn.metrics import classification_report
 from mlxtend.feature_selection import SequentialFeatureSelector as sfs
 
-my_data = genfromtxt('datasets/pd_speech.csv', delimiter=',', dtype=str)
-# Create feature and target arrays
-X = my_data[2:758, 1:754].astype(float)
-y = my_data[2:758, 754].astype(int)
+my_data = genfromtxt('datasets/kannada_letters.csv', delimiter=',', dtype=str)
+X = my_data[1:60001, 1:785].astype(float)
+y = my_data[1:60001, 0].astype(int)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42)
@@ -19,13 +18,12 @@ clf = RandomForestClassifier(n_estimators=10)
 
 #try multiple scoring parameters, like 'accuracy', 'neg_mean_squared_error', None
 sfs1 = sfs(clf,
-           k_features=20,
+           k_features=15,
            forward=True,
            floating=True,
            verbose=2,
            scoring='accuracy',
-           cv=3,
-           n_jobs=-1)
+           cv=3)
 sfs1 = sfs1.fit(X_train, y_train)
 
 feat_cols = list(sfs1.k_feature_idx_)
