@@ -1,12 +1,8 @@
 # Import necessary modules 
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import load_iris
 from sklearn.metrics import precision_score
-from sklearn import preprocessing
 from numpy import genfromtxt
 import numpy as np
-import matplotlib.pyplot as plt
 import xgboost as xgb
 
 #irisData = load_iris()

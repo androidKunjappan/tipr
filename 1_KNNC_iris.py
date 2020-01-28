@@ -9,11 +9,6 @@ import matplotlib.pyplot as plt
 #irisData = load_iris()
 
 my_data = genfromtxt('datasets/Iris.csv', delimiter=',', dtype=None)
-print(my_data)
-# Create feature and target arrays
-#X = irisData.data
-#y = irisData.target
-
 X = my_data[1:151, 1:5].astype(float)
 y = my_data[1:151, 5].astype(str)
 
