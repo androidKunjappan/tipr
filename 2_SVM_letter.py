@@ -24,5 +24,5 @@ test_accuracy = clf.score(X_test, y_test)
 
 y_pred = clf.predict(X_test)
 print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
-print("Train Accuracy:", test_accuracy)
+print("Train Accuracy:", train_accuracy)
 print("Test Accuracy:", test_accuracy)
