@@ -31,7 +31,7 @@ X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
 
 # Make an instance of the Model
-pca = PCA(.5)
+pca = PCA(120)
 pca.fit(X_train)
 
 X_train = pca.transform(X_train)
@@ -40,7 +40,7 @@ X_test = pca.transform(X_test)
 print(np.shape(X_train))
 print(np.shape(X_test))
 
-for k in [5, 10, 30, 60]:
+for k in [120, 100, 30, 60]:
     print(k)
     start = time.time()
     clf = SVC(kernel='linear')

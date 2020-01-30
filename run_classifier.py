@@ -110,12 +110,13 @@ def run_xgboost(X_train, X_test, y_train, y_test, normalize, max_depth, num_clas
     return train_accuracy, test_accuracy
 
 
-def run_nn(X_train, X_test, y_train, y_test, normalize, max_iter, hidden_layer_sizes):
+def run_nn(X_train, X_test, y_train, y_test, normalize, max_iter, hidden_layer_sizes, tolerance):
     if normalize == 'yes':
         X_train, X_test = normalize_features(X_train, X_test)
     print('Starting Neural Network classification..')
     start = time.time()
-    mlp = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes, activation='relu', solver='adam', max_iter=max_iter)
+    mlp = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes, activation='relu', solver='adam', max_iter=max_iter,
+                        tol=tolerance, learning_rate='adaptive')
     mlp.fit(X_train, y_train)
     train_accuracy = mlp.score(X_train, y_train)
     test_accuracy = mlp.score(X_test, y_test)

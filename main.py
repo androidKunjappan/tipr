@@ -58,6 +58,7 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42)
 
+    k_features = 0
     if dim_red == 'sffs':
         normalize = 'yes'
         k_features = cv = neighbors = 0
@@ -96,6 +97,48 @@ def main():
             print('XGBoost unsupported with SFFS.. proceeding to run without dimensionality reduction')
         if classifier != 'xgboost':
             X_train, X_test = dr.run_sffs(X_train, X_test, y_train, y_test, clf, normalize, k_features, cv)
+
+    elif dim_red == 'mi':
+        normalize = 'no'
+        if dataset == 'kannada':
+            normalize = 'yes'
+            k_features = 60
+        elif dataset == 'pd_speech':
+            normalize = 'yes'
+            k_features = 50
+        elif dataset == 'iris':
+            k_features = 3
+        elif dataset == 'letter':
+            k_features = 10
+        X_train, X_test = dr.run_mi(X_train, X_test, y_train, y_test, normalize, k_features)
+    elif dim_red == 'pca':
+        normalize = 'no'
+        if dataset == 'kannada':
+            normalize = 'yes'
+            k_features = 60
+        elif dataset == 'pd_speech':
+            normalize = 'yes'
+            k_features = .75
+        elif dataset == 'iris':
+            k_features = 3
+        elif dataset == 'letter':
+            k_features = 16
+
+        X_train, X_test = dr.run_pca(X_train, X_test, y_train, y_test, normalize, k_features)
+    elif dim_red == 'rp':
+        normalize = 'no'
+        if dataset == 'kannada':
+            normalize = 'yes'
+            k_features = 25
+        elif dataset == 'pd_speech':
+            normalize = 'yes'
+            k_features =20
+        elif dataset == 'iris':
+            k_features = 3
+        elif dataset == 'letter':
+            k_features = 10
+
+        X_train, X_test = dr.run_rp(X_train, X_test, y_train, y_test, normalize, k_features)
 
     # Run classifier
     if classifier == 'knnc':
@@ -155,16 +198,26 @@ def main():
         print('Training dataset accuracy\t:', train_accuracy)
         print('Testing dataset accuracy\t:', test_accuracy)
     elif classifier == 'nn':
+        tolerance = 1e-4
         normalize = 'yes'
         max_iter = 500
         hidden_layer_sizes = (8, 8, 8)
         if dataset in ['iris', 'letter']:
             normalize = 'no'
         if dataset == 'iris':
-            max_iter = 1000
+            max_iter = 10000
+            hidden_layer_sizes = (2,)
         elif dataset == 'kannada':
-            hidden_layer_sizes=(754, 150, 15)
-        train_accuracy, test_accuracy = rc.run_nn(X_train, X_test, y_train, y_test, normalize, max_iter, hidden_layer_sizes)
+            hidden_layer_sizes = (600, 100)
+            max_iter = 10000
+        elif dataset == 'pd_speech':
+            hidden_layer_sizes = (400, 50)
+            tolerance = 1e-25
+            max_iter = 100000
+        elif dataset == 'letter':
+            hidden_layer_sizes = (20, )
+
+        train_accuracy, test_accuracy = rc.run_nn(X_train, X_test, y_train, y_test, normalize, max_iter, hidden_layer_sizes, tolerance)
         print('*********Result********')
         print('Training dataset accuracy\t:', train_accuracy)
         print('Testing dataset accuracy\t:', test_accuracy)
