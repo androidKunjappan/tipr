@@ -13,6 +13,6 @@ example 2: python3 main.py iris knnc
 
 valid arguments
 ---------------
-<dataset> => [iris, letter, pd_speech, kannaada]
+<dataset> => [iris, letter, pd_speech, kannada]
 <classifier> => [knnc, svm, rf, xgboost, nn]
 <dimen_reduc> => none or [sffs, mi, lsh, pca, rp]

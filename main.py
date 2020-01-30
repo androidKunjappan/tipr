@@ -145,7 +145,7 @@ def main():
             normalize = 'yes'
             k_features =20
         elif dataset == 'iris':
-            k_featres = 3
+            k_features = 3
         elif dataset == 'letter':
             k_features = 10
 
