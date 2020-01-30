@@ -1,8 +1,13 @@
 import sys
 import read_datasets as rd
 import run_classifier as rc
+import run_dim_red as dr
+from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
 
 
 def initialize():  # function to read input initialize matrix
@@ -52,6 +57,45 @@ def main():
     # Split the data inti train(80%) and test(20%) sets
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42)
+
+    if dim_red == 'sffs':
+        normalize = 'yes'
+        k_features = cv = neighbors = 0
+        hidden_layer_sizes = (8, 8, 8)
+        max_iter = 500
+        if dataset in ['iris', 'letter']:
+            normalize = 'no'
+        if dataset == 'iris':
+            k_features = 3
+            cv = 5
+            neighbors = 1
+            max_iter = 1000
+        elif dataset == 'letter':
+            k_features = 10
+            cv = 3
+            neighbors = 4
+        elif dataset == 'pd_speech':
+            k_features = 20
+            cv = 3
+            neighbors = 1
+        elif dataset == 'kannada':
+            k_features = 15
+            cv = 3
+            neighbors = 5
+            hidden_layer_sizes = (754, 150, 15)
+        clf = RandomForestClassifier(n_estimators=10)
+        if classifier == 'knnc':
+            clf = KNeighborsClassifier(n_neighbors=neighbors, weights='distance')
+        elif classifier == 'svd':
+            clf = SVC(kernel='linear')
+        elif classifier == 'rf':
+            clf = RandomForestClassifier(n_estimators=10)
+        elif classifier == 'nn':
+            clf = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes, activation='relu', solver='adam', max_iter=max_iter)
+        elif classifier == 'xgboost':
+            print('XGBoost unsupported with SFFS.. proceeding to run without dimensionality reduction')
+        if classifier != 'xgboost':
+            X_train, X_test = dr.run_sffs(X_train, X_test, y_train, y_test, clf, normalize, k_features, cv)
 
     # Run classifier
     if classifier == 'knnc':
@@ -107,6 +151,20 @@ def main():
             num_class = 10
             num_round = 20
         train_accuracy, test_accuracy = rc.run_xgboost(X_train, X_test, y_train, y_test, normalize, max_depth, num_class, num_round)
+        print('*********Result********')
+        print('Training dataset accuracy\t:', train_accuracy)
+        print('Testing dataset accuracy\t:', test_accuracy)
+    elif classifier == 'nn':
+        normalize = 'yes'
+        max_iter = 500
+        hidden_layer_sizes = (8, 8, 8)
+        if dataset in ['iris', 'letter']:
+            normalize = 'no'
+        if dataset == 'iris':
+            max_iter = 1000
+        elif dataset == 'kannada':
+            hidden_layer_sizes=(754, 150, 15)
+        train_accuracy, test_accuracy = rc.run_nn(X_train, X_test, y_train, y_test, normalize, max_iter, hidden_layer_sizes)
         print('*********Result********')
         print('Training dataset accuracy\t:', train_accuracy)
         print('Testing dataset accuracy\t:', test_accuracy)

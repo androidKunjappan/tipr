@@ -7,6 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import precision_score
+from sklearn.neural_network import MLPClassifier
 
 
 def normalize_features(X_train, X_test):
@@ -71,7 +72,7 @@ def run_rf(X_train, X_test, y_train, y_test, normalize):
         X_train, X_test = normalize_features(X_train, X_test)
     print('Starting Random Forest classification..')
     start = time.time()
-    rfc = RandomForestClassifier()
+    rfc = RandomForestClassifier(n_estimators=10)
     rfc.fit(X_train, y_train)
     train_accuracy = rfc.score(X_train, y_train)
     test_accuracy = rfc.score(X_test, y_test)
@@ -95,8 +96,6 @@ def run_xgboost(X_train, X_test, y_train, y_test, normalize, max_depth, num_clas
         'objective': 'multi:softprob',  # error evaluation for multiclass training
         'num_class': num_class}  # the number of classes that exist in this datset
 
-    # ------------- numpy array ------------------
-    # training and testing - numpy matrices
     bst = xgb.train(param, dtrain, num_round)
     train_preds = bst.predict(dtrain)
     test_preds = bst.predict(dtest)
@@ -107,5 +106,19 @@ def run_xgboost(X_train, X_test, y_train, y_test, normalize, max_depth, num_clas
     train_accuracy = precision_score(y_train, train_best_preds, average='macro')
     test_accuracy = precision_score(y_test, test_best_preds, average='macro')
     end = time.time()
-    print('Random Forest classification done in', end - start, 'seconds\n')
+    print('XGBoost classification done in', end - start, 'seconds\n')
+    return train_accuracy, test_accuracy
+
+
+def run_nn(X_train, X_test, y_train, y_test, normalize, max_iter, hidden_layer_sizes):
+    if normalize == 'yes':
+        X_train, X_test = normalize_features(X_train, X_test)
+    print('Starting Neural Network classification..')
+    start = time.time()
+    mlp = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes, activation='relu', solver='adam', max_iter=max_iter)
+    mlp.fit(X_train, y_train)
+    train_accuracy = mlp.score(X_train, y_train)
+    test_accuracy = mlp.score(X_test, y_test)
+    end = time.time()
+    print('Neural Network classification done in', end - start, 'seconds\n')
     return train_accuracy, test_accuracy

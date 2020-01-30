@@ -11,7 +11,7 @@ y = my_data[1:151, 5].astype(str)
 
 # Split into training and test set
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=20)
+    X, y, test_size=0.2, random_state=42)
 
 mlp = MLPClassifier(hidden_layer_sizes=(2,), activation='identity', solver='adam', max_iter=10000,
                     tol=1e-4, learning_rate='adaptive')
