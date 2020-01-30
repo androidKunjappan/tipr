@@ -117,6 +117,8 @@ def main():
             k_features = 3
         elif dataset == 'letter':
             k_features = 10
+            if classifier in ['svm', 'nn']:
+                k_features = 15
         X_train, X_test = dr.run_mi(X_train, X_test, y_train, y_test, normalize, k_features)
     elif dim_red == 'pca':
         normalize = 'no'
@@ -129,7 +131,9 @@ def main():
         elif dataset == 'iris':
             k_features = 3
         elif dataset == 'letter':
-            k_features = 15
+            k_features = 10
+            if classifier in ['svm', 'nn', 'knnc']:
+                k_features = 15
 
         X_train, X_test = dr.run_pca(X_train, X_test, y_train, y_test, normalize, k_features)
     elif dim_red == 'rp':
@@ -141,7 +145,7 @@ def main():
             normalize = 'yes'
             k_features =20
         elif dataset == 'iris':
-            k_features = 3
+            k_featres = 3
         elif dataset == 'letter':
             k_features = 10
 
