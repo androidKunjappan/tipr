@@ -60,6 +60,7 @@ def main():
 
     k_features = 0
     if dim_red == 'sffs':
+        tolerance = 1e-4
         normalize = 'yes'
         k_features = cv = neighbors = 0
         hidden_layer_sizes = (8, 8, 8)
@@ -70,20 +71,26 @@ def main():
             k_features = 3
             cv = 5
             neighbors = 1
-            max_iter = 1000
+            max_iter = 10000
+            hidden_layer_sizes = (2,)
         elif dataset == 'letter':
             k_features = 10
             cv = 3
             neighbors = 4
+            hidden_layer_sizes = (20, )
         elif dataset == 'pd_speech':
             k_features = 20
             cv = 3
             neighbors = 1
+            hidden_layer_sizes = (400, 50)
+            tolerance = 1e-5
+            max_iter = 1000
         elif dataset == 'kannada':
             k_features = 15
             cv = 3
             neighbors = 5
-            hidden_layer_sizes = (754, 150, 15)
+            hidden_layer_sizes = (600, 100)
+            max_iter = 1000
         clf = RandomForestClassifier(n_estimators=10)
         if classifier == 'knnc':
             clf = KNeighborsClassifier(n_neighbors=neighbors, weights='distance')
@@ -92,7 +99,7 @@ def main():
         elif classifier == 'rf':
             clf = RandomForestClassifier(n_estimators=10)
         elif classifier == 'nn':
-            clf = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes, activation='relu', solver='adam', max_iter=max_iter)
+            clf = MLPClassifier(hidden_layer_sizes=hidden_layer_sizes, activation='relu', solver='adam', max_iter=max_iter, tol=tolerance)
         elif classifier == 'xgboost':
             print('XGBoost unsupported with SFFS.. proceeding to run without dimensionality reduction')
         if classifier != 'xgboost':
@@ -122,7 +129,7 @@ def main():
         elif dataset == 'iris':
             k_features = 3
         elif dataset == 'letter':
-            k_features = 16
+            k_features = 15
 
         X_train, X_test = dr.run_pca(X_train, X_test, y_train, y_test, normalize, k_features)
     elif dim_red == 'rp':
@@ -209,11 +216,11 @@ def main():
             hidden_layer_sizes = (2,)
         elif dataset == 'kannada':
             hidden_layer_sizes = (600, 100)
-            max_iter = 10000
+            max_iter = 1000
         elif dataset == 'pd_speech':
             hidden_layer_sizes = (400, 50)
-            tolerance = 1e-25
-            max_iter = 100000
+            tolerance = 1e-6
+            max_iter = 1000
         elif dataset == 'letter':
             hidden_layer_sizes = (20, )
 
