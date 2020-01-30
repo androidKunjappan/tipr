@@ -2,6 +2,7 @@ import sys
 import read_datasets as rd
 import run_classifier as rc
 from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
 
 
 def initialize():  # function to read input initialize matrix
@@ -61,6 +62,52 @@ def main():
         train_accuracy, test_accuracy, neighbor = rc.run_knnc(X_train, X_test, y_train, y_test, max_neighbors, normalize)
         print('*********Best Results********')
         print('No of neighbors =', neighbor)
+        print('Training dataset accuracy\t:', train_accuracy)
+        print('Testing dataset accuracy\t:', test_accuracy)
+    elif classifier == 'svm':
+        normalize = 'yes'
+        if dataset in ['iris', 'letter', 'kannada']:
+            normalize = 'no'
+        train_accuracy, test_accuracy = rc.run_svm(X_train, X_test, y_train, y_test, normalize)
+        print('*********Result********')
+        print('Training dataset accuracy\t:', train_accuracy)
+        print('Testing dataset accuracy\t:', test_accuracy)
+    elif classifier == 'rf':
+        normalize = 'yes'
+        if dataset in ['iris', 'letter']:
+            normalize = 'no'
+        train_accuracy, test_accuracy = rc.run_rf(X_train, X_test, y_train, y_test, normalize)
+        print('*********Result********')
+        print('Training dataset accuracy\t:', train_accuracy)
+        print('Testing dataset accuracy\t:', test_accuracy)
+    elif classifier == 'xgboost':
+        normalize = 'yes'
+        max_depth = num_class = num_round = 0
+        if dataset in ['iris', 'letter']:
+            normalize = 'no'
+            le = preprocessing.LabelEncoder()
+            le.fit(y)
+            y = le.transform(y)
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=42)
+        if dataset == 'iris':
+            max_depth = 4
+            num_class = 3
+            num_round = 10
+        elif dataset == 'letter':
+            max_depth = 15
+            num_class = 26
+            num_round = 60
+        elif dataset == 'pd_speech':
+            max_depth = 6
+            num_class = 2
+            num_round = 25
+        elif dataset == 'kannada':
+            max_depth = 10
+            num_class = 10
+            num_round = 20
+        train_accuracy, test_accuracy = rc.run_xgboost(X_train, X_test, y_train, y_test, normalize, max_depth, num_class, num_round)
+        print('*********Result********')
         print('Training dataset accuracy\t:', train_accuracy)
         print('Testing dataset accuracy\t:', test_accuracy)
 

@@ -1,11 +1,16 @@
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+import xgboost as xgb
+from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import precision_score
 
 
 def normalize_features(X_train, X_test):
+    print('Normalizing features..')
     scaler = StandardScaler()
     scaler.fit(X_train)
     X_train = scaler.transform(X_train)
@@ -18,11 +23,11 @@ def run_knnc(X_train, X_test, y_train, y_test, max_neighbors, normalize):
         X_train, X_test = normalize_features(X_train, X_test)
     train_accuracy = np.empty(max_neighbors)
     test_accuracy = np.empty(max_neighbors)
-    neighbors = np.arange(1, max_neighbors+1)
+    neighbors = np.arange(1, max_neighbors + 1)
     start = time.time()
     for k in range(max_neighbors):
-        print('Running for', k+1, 'neighbors..')
-        knn = KNeighborsClassifier(n_neighbors=k+1, weights='distance')
+        print('Running for', k + 1, 'neighbors..')
+        knn = KNeighborsClassifier(n_neighbors=k + 1, weights='distance')
         knn.fit(X_train, y_train)
 
         train_accuracy[k] = knn.score(X_train, y_train)
@@ -44,4 +49,63 @@ def run_knnc(X_train, X_test, y_train, y_test, max_neighbors, normalize):
         if test_accuracy[k] > max_accuracy:
             max_accuracy = test_accuracy[k]
             best_index = k
-    return train_accuracy[best_index], test_accuracy[best_index], best_index+1
+    return train_accuracy[best_index], test_accuracy[best_index], best_index + 1
+
+
+def run_svm(X_train, X_test, y_train, y_test, normalize='no'):
+    if normalize == 'yes':
+        X_train, X_test = normalize_features(X_train, X_test)
+    print('Starting SVM classification..')
+    start = time.time()
+    clf = SVC(kernel='linear')
+    clf.fit(X_train, y_train)
+    train_accuracy = clf.score(X_train, y_train)
+    test_accuracy = clf.score(X_test, y_test)
+    end = time.time()
+    print('SVM classification done in', end - start, 'seconds\n')
+    return train_accuracy, test_accuracy
+
+
+def run_rf(X_train, X_test, y_train, y_test, normalize):
+    if normalize == 'yes':
+        X_train, X_test = normalize_features(X_train, X_test)
+    print('Starting Random Forest classification..')
+    start = time.time()
+    rfc = RandomForestClassifier()
+    rfc.fit(X_train, y_train)
+    train_accuracy = rfc.score(X_train, y_train)
+    test_accuracy = rfc.score(X_test, y_test)
+    end = time.time()
+    print('Random Forest classification done in', end - start, 'seconds\n')
+    return train_accuracy, test_accuracy
+
+
+def run_xgboost(X_train, X_test, y_train, y_test, normalize, max_depth, num_class, num_round):
+    if normalize == 'yes':
+        X_train, X_test = normalize_features(X_train, X_test)
+    print('Starting XGBoost classification..')
+    start = time.time()
+    dtrain = xgb.DMatrix(X_train, label=y_train)
+    dtest = xgb.DMatrix(X_test, label=y_test)
+
+    param = {
+        'max_depth': max_depth,  # the maximum depth of each tree
+        'eta': 0.3,  # the training step for each iteration
+        'silent': 1,  # logging mode - quiet
+        'objective': 'multi:softprob',  # error evaluation for multiclass training
+        'num_class': num_class}  # the number of classes that exist in this datset
+
+    # ------------- numpy array ------------------
+    # training and testing - numpy matrices
+    bst = xgb.train(param, dtrain, num_round)
+    train_preds = bst.predict(dtrain)
+    test_preds = bst.predict(dtest)
+
+    # extracting most confident predictions
+    train_best_preds = np.asarray([np.argmax(line) for line in train_preds])
+    test_best_preds = np.asarray([np.argmax(line) for line in test_preds])
+    train_accuracy = precision_score(y_train, train_best_preds, average='macro')
+    test_accuracy = precision_score(y_test, test_best_preds, average='macro')
+    end = time.time()
+    print('Random Forest classification done in', end - start, 'seconds\n')
+    return train_accuracy, test_accuracy
