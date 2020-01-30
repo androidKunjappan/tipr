@@ -7,11 +7,6 @@ from sklearn.preprocessing import StandardScaler
 from LSH_ANN import LSH_ANN
 
 # reading csv file and extracting class column to y.
-my_data = genfromtxt('datasets/letter-recognition.csv', delimiter=',', dtype=str)
-# Create feature and target arrays
-X = my_data[0:20000, 1:17].astype(int)
-y = my_data[0:20000, 0].astype(str)
-
 my_data = genfromtxt('datasets/kannada_letters.csv', delimiter=',', dtype=str)
 
 # Create feature and target arrays
