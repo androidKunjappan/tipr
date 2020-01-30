@@ -13,8 +13,9 @@ y = my_data[1:151, 5].astype(str)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=20)
 
-mlp = MLPClassifier(hidden_layer_sizes=(8, 8, 8), activation='relu', solver='adam', max_iter=1000)
-mlp.fit(X_train,y_train)
+mlp = MLPClassifier(hidden_layer_sizes=(2,), activation='identity', solver='adam', max_iter=10000,
+                    tol=1e-4, learning_rate='adaptive')
+mlp.fit(X_train, y_train)
 
 predict_train = mlp.predict(X_train)
 predict_test = mlp.predict(X_test)
